@@ -395,10 +395,29 @@ input, textarea, select {
 	transform: scaleX(1);
 }
 
+/* Chevron indicator on parent nav items */
+.fs-nav__chevron {
+	display: inline-block;
+	vertical-align: middle;
+	margin-left: 4px;
+	flex-shrink: 0;
+	pointer-events: none;
+	transition: transform var(--fs-duration) var(--fs-ease);
+}
+
+.fs-nav > li.menu-item-has-children > a {
+	display: flex;
+	align-items: center;
+}
+
+.fs-nav > li.menu-item-has-children:hover > a .fs-nav__chevron {
+	transform: rotate(180deg);
+}
+
 /* Submenu */
 .fs-nav .sub-menu {
 	position: absolute;
-	top: 100%;
+	top: calc(100% + 4px);
 	left: 0;
 	min-width: 220px;
 	background: var(--fs-bg-card);
@@ -410,6 +429,7 @@ input, textarea, select {
 	transform: translateY(8px);
 	transition: all var(--fs-duration) var(--fs-ease);
 	box-shadow: var(--fs-shadow-lg);
+	z-index: 100;
 }
 
 .fs-nav > li:hover > .sub-menu {
@@ -626,10 +646,71 @@ input, textarea, select {
 	border-bottom: 1px solid var(--fs-border);
 }
 
+/* Parent items: flex row so link + toggle button sit side by side */
+.fs-mobile-menu .menu-item-has-children {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: stretch;
+}
+
+.fs-mobile-menu .menu-item-has-children > a {
+	flex: 1;
+	border-bottom: 1px solid var(--fs-border);
+}
+
+.fs-mobile-menu .menu-item-has-children > .sub-menu {
+	width: 100%;
+}
+
+/* Submenu toggle button (injected by JS) */
+.fs-mobile-submenu-toggle {
+	flex-shrink: 0;
+	background: none;
+	border: none;
+	border-left: 1px solid var(--fs-border);
+	border-bottom: 1px solid var(--fs-border);
+	color: var(--fs-text-secondary);
+	padding: 0 1rem;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: color var(--fs-duration) var(--fs-ease);
+}
+
+.fs-mobile-submenu-toggle:hover,
+.fs-mobile-submenu-toggle.open {
+	color: var(--fs-accent-primary);
+}
+
+.fs-mobile-submenu-toggle svg {
+	transition: transform var(--fs-duration) var(--fs-ease);
+}
+
+.fs-mobile-submenu-toggle.open svg {
+	transform: rotate(180deg);
+}
+
+/* Submenu hidden by default; toggled via JS */
+.fs-mobile-menu .sub-menu {
+	display: none;
+	padding: 0.25rem 0;
+	background: rgba(255, 255, 255, 0.02);
+	border-bottom: 1px solid var(--fs-border);
+}
+
+.fs-mobile-menu .sub-menu.open {
+	display: block;
+}
+
 .fs-mobile-menu .sub-menu a {
 	padding: 0.5rem var(--fs-gutter) 0.5rem 2.5rem;
 	font-size: 0.9rem;
 	color: var(--fs-text-secondary);
+}
+
+.fs-mobile-menu .sub-menu a:hover {
+	color: var(--fs-accent-primary);
 }
 
 /* Overlay */
@@ -2563,4 +2644,743 @@ input, textarea, select {
 .fs-empty-cart__text {
 	color: var(--fs-text-secondary);
 	font-size: 1.1rem;
+}
+
+/* ==========================================================================
+   18. PAGE HERO (shared by info pages)
+   ========================================================================== */
+.fs-page-hero {
+	padding: 3rem 0 2.5rem;
+	border-bottom: 1px solid var(--fs-border);
+	background: linear-gradient(180deg, var(--fs-bg-secondary) 0%, transparent 100%);
+}
+
+.fs-page-hero__title {
+	font-size: clamp(1.75rem, 4vw, 2.75rem);
+	font-weight: 800;
+	letter-spacing: -0.02em;
+	margin: 0.5rem 0 0.75rem;
+	background: linear-gradient(135deg, var(--fs-text-primary), var(--fs-accent-secondary));
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+}
+
+.fs-page-hero__subtitle {
+	font-size: 1.05rem;
+	color: var(--fs-text-secondary);
+	max-width: 600px;
+	margin: 0;
+}
+
+.fs-info-container {
+	padding-top: 3rem;
+	padding-bottom: 4rem;
+}
+
+/* ==========================================================================
+   19. TAX INFORMATION PAGE
+   ========================================================================== */
+.fs-tax-layout {
+	max-width: 900px;
+	margin: 0 auto;
+}
+
+.fs-tax-content {
+	display: flex;
+	flex-direction: column;
+	gap: 0;
+}
+
+.fs-tax-section {
+	display: grid;
+	grid-template-columns: 52px 1fr;
+	gap: 0 1.5rem;
+	padding: 2.5rem 0;
+	border-bottom: 1px solid var(--fs-border);
+}
+
+.fs-tax-section:last-child {
+	border-bottom: none;
+}
+
+.fs-tax-section__icon {
+	width: 44px;
+	height: 44px;
+	border-radius: var(--fs-radius);
+	background: rgba(139, 92, 246, 0.1);
+	border: 1px solid rgba(139, 92, 246, 0.2);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: var(--fs-accent-primary);
+	flex-shrink: 0;
+	margin-top: 0.2rem;
+}
+
+.fs-tax-section__title {
+	font-size: 1.25rem;
+	font-weight: 700;
+	margin-bottom: 1rem;
+}
+
+.fs-tax-section__body p {
+	color: var(--fs-text-secondary);
+	line-height: 1.75;
+	margin-bottom: 1.25rem;
+}
+
+.fs-tax-section__body p:last-child {
+	margin-bottom: 0;
+}
+
+/* Province cards */
+.fs-tax-provinces {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 1rem;
+	margin-top: 1.25rem;
+}
+
+@media (min-width: 640px) {
+	.fs-tax-provinces { grid-template-columns: 1fr 1fr; }
+}
+
+.fs-tax-province-card {
+	background: var(--fs-bg-card);
+	border: 1px solid var(--fs-border);
+	border-radius: var(--fs-radius);
+	padding: 1.25rem;
+}
+
+.fs-tax-province-card--federal {
+	border-top: 3px solid var(--fs-accent-secondary);
+}
+
+.fs-tax-province-card--both {
+	border-top: 3px solid var(--fs-accent-primary);
+}
+
+.fs-tax-province-card__label {
+	font-size: 0.8rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.07em;
+	margin-bottom: 0.75rem;
+	color: var(--fs-text-muted);
+}
+
+.fs-tax-province-card--federal .fs-tax-province-card__label {
+	color: var(--fs-accent-secondary);
+}
+
+.fs-tax-province-card--both .fs-tax-province-card__label {
+	color: var(--fs-accent-primary);
+}
+
+.fs-tax-province-card__list {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 0.35rem;
+}
+
+.fs-tax-province-card__list li {
+	font-size: 0.9rem;
+	color: var(--fs-text-secondary);
+	padding-left: 1rem;
+	position: relative;
+}
+
+.fs-tax-province-card__list li::before {
+	content: '–';
+	position: absolute;
+	left: 0;
+	color: var(--fs-text-muted);
+}
+
+/* Rate box */
+.fs-tax-rate-box {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+	margin: 1.25rem 0;
+	padding: 1.25rem;
+	background: var(--fs-bg-card);
+	border: 1px solid var(--fs-border);
+	border-radius: var(--fs-radius);
+	border-left: 3px solid var(--fs-accent-primary);
+}
+
+.fs-tax-rate-item {
+	display: flex;
+	align-items: baseline;
+	gap: 0.75rem;
+}
+
+.fs-tax-rate-item__amount {
+	font-family: var(--fs-font-heading);
+	font-size: 1.35rem;
+	font-weight: 700;
+	color: var(--fs-accent-primary);
+	white-space: nowrap;
+}
+
+.fs-tax-rate-item__desc {
+	font-size: 0.9rem;
+	color: var(--fs-text-secondary);
+}
+
+/* Example tables */
+.fs-tax-examples {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+@media (min-width: 640px) {
+	.fs-tax-examples { grid-template-columns: 1fr 1fr; }
+}
+
+.fs-tax-example__title {
+	font-size: 0.85rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+	color: var(--fs-text-muted);
+	margin-bottom: 0.75rem;
+}
+
+.fs-tax-table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 0.9rem;
+}
+
+.fs-tax-table th {
+	text-align: left;
+	padding: 0.5rem 0.75rem;
+	background: var(--fs-bg-elevated);
+	color: var(--fs-text-muted);
+	font-size: 0.78rem;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	border-bottom: 1px solid var(--fs-border);
+}
+
+.fs-tax-table td {
+	padding: 0.6rem 0.75rem;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+	color: var(--fs-text-secondary);
+}
+
+.fs-tax-table tr:last-child td {
+	border-bottom: none;
+}
+
+.fs-tax-table__total {
+	font-weight: 700;
+	color: var(--fs-accent-primary) !important;
+}
+
+/* CTA section contacts */
+.fs-tax-contact-links {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1rem;
+	align-items: center;
+	margin-top: 1.25rem;
+}
+
+.fs-tax-contact-link {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	color: var(--fs-accent-secondary);
+	text-decoration: none;
+	font-size: 0.95rem;
+	font-weight: 500;
+	transition: color 0.2s ease;
+}
+
+.fs-tax-contact-link:hover {
+	color: var(--fs-accent-primary);
+}
+
+.fs-tax-section--cta {
+	background: linear-gradient(135deg, rgba(139,92,246,0.04), rgba(6,182,212,0.04));
+	border-radius: var(--fs-radius);
+	padding: 2rem;
+	border: 1px solid rgba(139, 92, 246, 0.1);
+	margin-top: 0.5rem;
+}
+
+/* ==========================================================================
+   20. ABOUT US PAGE
+   ========================================================================== */
+
+/* Mission */
+.fs-about-mission {
+	padding-top: 3rem;
+}
+
+.fs-about-mission__grid {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 3rem;
+	align-items: center;
+}
+
+@media (min-width: 768px) {
+	.fs-about-mission__grid { grid-template-columns: 1fr 420px; }
+}
+
+.fs-section__eyebrow {
+	display: inline-block;
+	font-size: 0.78rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.1em;
+	color: var(--fs-accent-primary);
+	margin-bottom: 0.75rem;
+}
+
+.fs-about-mission__title {
+	font-size: clamp(1.5rem, 3vw, 2.25rem);
+	font-weight: 800;
+	letter-spacing: -0.02em;
+	margin-bottom: 1.25rem;
+}
+
+.fs-about-mission__content p {
+	color: var(--fs-text-secondary);
+	line-height: 1.8;
+	margin-bottom: 1rem;
+}
+
+.fs-about-mission__actions {
+	display: flex;
+	gap: 1rem;
+	flex-wrap: wrap;
+	margin-top: 1.75rem;
+}
+
+.fs-about-visual-card {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.fs-about-visual-card__inner {
+	position: relative;
+	width: 280px;
+	height: 280px;
+	border-radius: 50%;
+	background: var(--fs-bg-card);
+	border: 1px solid var(--fs-border);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	box-shadow: 0 0 80px rgba(139, 92, 246, 0.12);
+}
+
+.fs-about-visual-card__badge {
+	position: absolute;
+	bottom: 20px;
+	right: 20px;
+	background: var(--fs-accent-primary);
+	color: #fff;
+	border-radius: var(--fs-radius-pill);
+	padding: 0.4rem 0.85rem;
+	font-size: 0.8rem;
+	font-weight: 700;
+}
+
+/* Stats bar */
+.fs-about-stats {
+	background: var(--fs-bg-card);
+	border-top: 1px solid var(--fs-border);
+	border-bottom: 1px solid var(--fs-border);
+	padding: 2.5rem 0;
+	margin: 3rem 0;
+}
+
+.fs-about-stats__grid {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 1.5rem;
+	max-width: 900px;
+	margin: 0 auto;
+	padding: 0 var(--fs-gutter);
+}
+
+@media (min-width: 768px) {
+	.fs-about-stats__grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+.fs-about-stat {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.35rem;
+	text-align: center;
+}
+
+.fs-about-stat__number {
+	font-family: var(--fs-font-heading);
+	font-size: 2.25rem;
+	font-weight: 800;
+	background: linear-gradient(135deg, var(--fs-accent-primary), var(--fs-accent-secondary));
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+}
+
+.fs-about-stat__label {
+	font-size: 0.85rem;
+	color: var(--fs-text-muted);
+}
+
+/* Values */
+.fs-about-values__grid {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 1.25rem;
+}
+
+@media (min-width: 640px) {
+	.fs-about-values__grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (min-width: 1024px) {
+	.fs-about-values__grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+.fs-about-value-card {
+	background: var(--fs-bg-card);
+	border: 1px solid var(--fs-border);
+	border-radius: var(--fs-radius);
+	padding: 1.75rem;
+	transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.fs-about-value-card:hover {
+	border-color: rgba(139, 92, 246, 0.3);
+	transform: translateY(-2px);
+}
+
+.fs-about-value-card__icon {
+	width: 52px;
+	height: 52px;
+	border-radius: var(--fs-radius);
+	background: rgba(139, 92, 246, 0.1);
+	border: 1px solid rgba(139, 92, 246, 0.2);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: var(--fs-accent-primary);
+	margin-bottom: 1.25rem;
+}
+
+.fs-about-value-card__title {
+	font-size: 1rem;
+	font-weight: 700;
+	margin-bottom: 0.6rem;
+}
+
+.fs-about-value-card__text {
+	font-size: 0.9rem;
+	color: var(--fs-text-secondary);
+	line-height: 1.7;
+	margin: 0;
+}
+
+/* CTA banner */
+.fs-about-cta {
+	padding: 4rem 0;
+	background: linear-gradient(135deg, rgba(139,92,246,0.06) 0%, rgba(6,182,212,0.06) 100%);
+	border-top: 1px solid var(--fs-border);
+	border-bottom: 1px solid var(--fs-border);
+}
+
+.fs-about-cta__inner {
+	max-width: 640px;
+	margin: 0 auto;
+	text-align: center;
+	padding: 0 var(--fs-gutter);
+}
+
+.fs-about-cta__title {
+	font-size: clamp(1.4rem, 3vw, 2rem);
+	font-weight: 800;
+	margin-bottom: 0.75rem;
+}
+
+.fs-about-cta__text {
+	color: var(--fs-text-secondary);
+	margin-bottom: 2rem;
+}
+
+.fs-about-cta__actions {
+	display: flex;
+	justify-content: center;
+	gap: 1rem;
+}
+
+/* ==========================================================================
+   21. CONTACT PAGE
+   ========================================================================== */
+.fs-contact-layout {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 3rem;
+}
+
+@media (min-width: 768px) {
+	.fs-contact-layout {
+		grid-template-columns: 1fr 340px;
+		align-items: start;
+	}
+}
+
+/* Form wrap */
+.fs-contact-form-wrap__title {
+	font-size: 1.35rem;
+	font-weight: 700;
+	margin-bottom: 1.5rem;
+}
+
+/* Notices */
+.fs-contact-notice {
+	display: flex;
+	align-items: flex-start;
+	gap: 0.75rem;
+	padding: 1rem 1.25rem;
+	border-radius: var(--fs-radius-sm);
+	margin-bottom: 1.5rem;
+	font-size: 0.9rem;
+	line-height: 1.6;
+}
+
+.fs-contact-notice svg {
+	flex-shrink: 0;
+	margin-top: 0.15rem;
+}
+
+.fs-contact-notice--success {
+	background: rgba(34, 197, 94, 0.08);
+	border: 1px solid rgba(34, 197, 94, 0.25);
+	color: #22c55e;
+}
+
+.fs-contact-notice--error {
+	background: rgba(236, 72, 153, 0.08);
+	border: 1px solid rgba(236, 72, 153, 0.25);
+	color: var(--fs-accent-tertiary);
+}
+
+/* Form elements */
+.fs-contact-form {
+	display: flex;
+	flex-direction: column;
+	gap: 1.25rem;
+}
+
+.fs-form-row--2col {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 1.25rem;
+}
+
+@media (min-width: 480px) {
+	.fs-form-row--2col { grid-template-columns: 1fr 1fr; }
+}
+
+.fs-form-group {
+	display: flex;
+	flex-direction: column;
+	gap: 0.35rem;
+}
+
+.fs-form-label {
+	font-size: 0.875rem;
+	font-weight: 600;
+	color: var(--fs-text-secondary);
+	display: flex;
+	align-items: center;
+	gap: 0.4rem;
+}
+
+.fs-form-required {
+	color: var(--fs-accent-tertiary);
+}
+
+.fs-form-optional {
+	font-weight: 400;
+	color: var(--fs-text-muted);
+	font-size: 0.8rem;
+}
+
+.fs-form-input {
+	width: 100%;
+	background: var(--fs-bg-card);
+	border: 1px solid var(--fs-border);
+	border-radius: var(--fs-radius-sm);
+	padding: 0.75rem 1rem;
+	color: var(--fs-text-primary);
+	font-size: 0.95rem;
+	outline: none;
+	transition: border-color 0.2s ease, box-shadow 0.2s ease;
+	font-family: inherit;
+}
+
+.fs-form-input:focus {
+	border-color: var(--fs-accent-primary);
+	box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}
+
+.fs-form-input::placeholder {
+	color: var(--fs-text-muted);
+}
+
+.fs-form-textarea {
+	resize: vertical;
+	min-height: 140px;
+	line-height: 1.6;
+}
+
+.fs-contact-submit {
+	width: 100%;
+	justify-content: center;
+	gap: 0.75rem;
+}
+
+/* Contact info sidebar */
+.fs-contact-info-card {
+	background: var(--fs-bg-card);
+	border: 1px solid var(--fs-border);
+	border-radius: var(--fs-radius);
+	padding: 1.75rem;
+	position: sticky;
+	top: 100px;
+}
+
+.fs-contact-info-card__title {
+	font-size: 1.1rem;
+	font-weight: 700;
+	margin-bottom: 1.5rem;
+	padding-bottom: 1rem;
+	border-bottom: 1px solid var(--fs-border);
+}
+
+.fs-contact-details {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 1.25rem;
+}
+
+.fs-contact-detail {
+	display: flex;
+	gap: 1rem;
+	align-items: flex-start;
+}
+
+.fs-contact-detail__icon {
+	width: 40px;
+	height: 40px;
+	border-radius: var(--fs-radius-sm);
+	background: rgba(139, 92, 246, 0.1);
+	border: 1px solid rgba(139, 92, 246, 0.2);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: var(--fs-accent-primary);
+	flex-shrink: 0;
+}
+
+.fs-contact-detail__body {
+	display: flex;
+	flex-direction: column;
+	gap: 0.15rem;
+}
+
+.fs-contact-detail__label {
+	font-size: 0.75rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.07em;
+	color: var(--fs-text-muted);
+}
+
+.fs-contact-detail__value {
+	font-size: 0.95rem;
+	font-weight: 500;
+	color: var(--fs-text-primary);
+	text-decoration: none;
+}
+
+a.fs-contact-detail__value:hover {
+	color: var(--fs-accent-primary);
+}
+
+.fs-contact-detail__note {
+	font-size: 0.82rem;
+	color: var(--fs-text-muted);
+}
+
+/* Business hours */
+.fs-contact-hours {
+	margin-top: 1.5rem;
+	padding-top: 1.5rem;
+	border-top: 1px solid var(--fs-border);
+}
+
+.fs-contact-hours__title {
+	font-size: 0.8rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.07em;
+	color: var(--fs-text-muted);
+	margin-bottom: 0.75rem;
+}
+
+.fs-contact-hours__list {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 0.4rem;
+}
+
+.fs-contact-hours__list li {
+	display: flex;
+	justify-content: space-between;
+	font-size: 0.875rem;
+	color: var(--fs-text-secondary);
+}
+
+/* Response time note */
+.fs-contact-response {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	margin-top: 1.25rem;
+	padding: 0.75rem 1rem;
+	background: rgba(139, 92, 246, 0.06);
+	border-radius: var(--fs-radius-sm);
+	font-size: 0.82rem;
+	color: var(--fs-text-muted);
+}
+
+.fs-contact-response svg {
+	flex-shrink: 0;
+	color: var(--fs-accent-primary);
 }

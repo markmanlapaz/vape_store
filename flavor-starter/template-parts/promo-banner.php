@@ -11,14 +11,36 @@ $promo_show    = get_theme_mod( 'fs_promo_show', true );
 $promo1_title  = get_theme_mod( 'fs_promo1_title', __( 'Starter Kits', 'flavor-starter' ) );
 $promo1_text   = get_theme_mod( 'fs_promo1_text', __( 'Everything you need to get started', 'flavor-starter' ) );
 $promo1_btn    = get_theme_mod( 'fs_promo1_btn', __( 'Shop Kits', 'flavor-starter' ) );
-$promo1_url    = get_theme_mod( 'fs_promo1_url', '#' );
 $promo1_bg     = get_theme_mod( 'fs_promo1_bg', '' );
 
 $promo2_title  = get_theme_mod( 'fs_promo2_title', __( 'Premium E-Liquids', 'flavor-starter' ) );
 $promo2_text   = get_theme_mod( 'fs_promo2_text', __( 'Over 200 flavors to choose from', 'flavor-starter' ) );
 $promo2_btn    = get_theme_mod( 'fs_promo2_btn', __( 'Browse Flavors', 'flavor-starter' ) );
-$promo2_url    = get_theme_mod( 'fs_promo2_url', '#' );
 $promo2_bg     = get_theme_mod( 'fs_promo2_bg', '' );
+
+// Resolve smart defaults for promo card URLs at render time.
+$_wc_promo   = class_exists( 'WooCommerce' );
+$_shop_promo = $_wc_promo ? wc_get_page_permalink( 'shop' ) : home_url( '/' );
+
+$promo1_url = get_theme_mod( 'fs_promo1_url', '' );
+if ( empty( $promo1_url ) || '#' === $promo1_url ) {
+	if ( $_wc_promo ) {
+		$_t = get_term_by( 'slug', 'devices-kits', 'product_cat' );
+		$promo1_url = ( $_t && ! is_wp_error( $_t ) ) ? (string) get_term_link( $_t ) : $_shop_promo;
+	} else {
+		$promo1_url = $_shop_promo;
+	}
+}
+
+$promo2_url = get_theme_mod( 'fs_promo2_url', '' );
+if ( empty( $promo2_url ) || '#' === $promo2_url ) {
+	if ( $_wc_promo ) {
+		$_t = get_term_by( 'slug', 'e-liquid', 'product_cat' );
+		$promo2_url = ( $_t && ! is_wp_error( $_t ) ) ? (string) get_term_link( $_t ) : $_shop_promo;
+	} else {
+		$promo2_url = $_shop_promo;
+	}
+}
 
 if ( ! $promo_show ) {
 	return;

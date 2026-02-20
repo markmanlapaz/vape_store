@@ -127,6 +127,43 @@ function flavor_starter_single_product_wrap_close() {
 add_action( 'woocommerce_after_single_product_summary', 'flavor_starter_single_product_wrap_close', 1 );
 
 /*--------------------------------------------------------------
+ * Wrap tabs + related + upsells in a container.
+ * The gallery/summary wrap closes at priority 1; we open at 5 and
+ * close at 99 so everything in between is inside the container.
+ *------------------------------------------------------------*/
+function flavor_starter_product_extra_open() {
+	echo '<div class="fs-container fs-product-extra">';
+}
+add_action( 'woocommerce_after_single_product_summary', 'flavor_starter_product_extra_open', 5 );
+
+function flavor_starter_product_extra_close() {
+	echo '</div>';
+}
+add_action( 'woocommerce_after_single_product_summary', 'flavor_starter_product_extra_close', 99 );
+
+/*--------------------------------------------------------------
+ * Wishlist button alongside Add to Cart on single product.
+ *------------------------------------------------------------*/
+function flavor_starter_single_product_wishlist() {
+	global $product;
+	if ( ! $product ) {
+		return;
+	}
+	?>
+	<button
+		type="button"
+		class="fs-btn fs-btn--outline fs-single-wishlist-btn fs-wishlist-btn"
+		data-product-id="<?php echo esc_attr( $product->get_id() ); ?>"
+		aria-label="<?php esc_attr_e( 'Add to Wishlist', 'flavor-starter' ); ?>"
+	>
+		<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+		<?php esc_html_e( 'Wishlist', 'flavor-starter' ); ?>
+	</button>
+	<?php
+}
+add_action( 'woocommerce_after_add_to_cart_button', 'flavor_starter_single_product_wishlist' );
+
+/*--------------------------------------------------------------
  * Empty cart message
  *------------------------------------------------------------*/
 function flavor_starter_empty_cart_message() {

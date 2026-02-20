@@ -11,7 +11,7 @@ defined( 'ABSPATH' ) || exit;
 if ( class_exists( 'WooCommerce' ) && ( is_shop() || is_product_category() || is_product_tag() || is_product() ) ) {
 	$sidebar_id = 'sidebar-shop';
 } else {
-	$sidebar_id = 'sidebar-blog';
+	return;
 }
 
 if ( ! is_active_sidebar( $sidebar_id ) ) {

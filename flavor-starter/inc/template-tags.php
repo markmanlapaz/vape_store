@@ -114,17 +114,236 @@ function flavor_starter_social_links() {
 }
 
 /*--------------------------------------------------------------
- * Fallback menu
+ * Fallback menu — shown when no WordPress menu is assigned.
  *------------------------------------------------------------*/
 function flavor_starter_fallback_menu() {
+	$wc   = class_exists( 'WooCommerce' );
+	$shop = $wc ? wc_get_page_permalink( 'shop' ) : home_url( '/' );
+
+	/**
+	 * Return a WooCommerce product-category archive URL.
+	 * Falls back to the shop URL with a query-string filter if the term
+	 * does not exist yet.
+	 */
+	$cat = function( $slug ) use ( $wc, $shop ) {
+		if ( ! $wc ) {
+			return $shop;
+		}
+		$term = get_term_by( 'slug', $slug, 'product_cat' );
+		if ( $term && ! is_wp_error( $term ) ) {
+			$url = get_term_link( $term );
+			return is_wp_error( $url ) ? $shop : $url;
+		}
+		return add_query_arg( 'product_cat', $slug, $shop );
+	};
+
+	/**
+	 * Return a WordPress page URL by its path/slug.
+	 * Falls back to home_url( '/slug/' ) if the page does not exist yet.
+	 */
+	$pg = function( $path ) {
+		$page = get_page_by_path( $path );
+		return $page ? get_permalink( $page->ID ) : home_url( '/' . ltrim( $path, '/' ) . '/' );
+	};
+
+	$chevron = '<svg class="fs-nav__chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>';
+
+	$items = array(
+		array(
+			'label'    => __( 'Devices', 'flavor-starter' ),
+			'url'      => $cat( 'devices-kits' ),
+			'children' => array(
+				array( 'label' => __( 'Disposable Vapes',   'flavor-starter' ), 'url' => $cat( 'disposable-vapes' ) ),
+				array( 'label' => __( 'Closed Pod Devices', 'flavor-starter' ), 'url' => $cat( 'closed-pod-devices' ) ),
+				array( 'label' => __( 'Open Pod Devices',   'flavor-starter' ), 'url' => $cat( 'open-pod-devices' ) ),
+				array( 'label' => __( 'Devices & Kits',     'flavor-starter' ), 'url' => $cat( 'devices-kits' ) ),
+				array( 'label' => __( 'RDA & RDTA',         'flavor-starter' ), 'url' => $cat( 'rda-rdta' ) ),
+			),
+		),
+		array(
+			'label'    => __( 'E-Liquid', 'flavor-starter' ),
+			'url'      => $cat( 'e-liquid' ),
+			'children' => array(
+				array( 'label' => __( 'Salt Nic', 'flavor-starter' ), 'url' => $cat( 'salt-nic' ) ),
+				array( 'label' => __( 'Freebase', 'flavor-starter' ), 'url' => $cat( 'freebase' ) ),
+			),
+		),
+		array(
+			'label' => __( 'Coils & Pods', 'flavor-starter' ),
+			'url'   => $cat( 'coils-pods' ),
+		),
+		array(
+			'label'    => __( 'Accessories', 'flavor-starter' ),
+			'url'      => $cat( 'accessories' ),
+			'children' => array(
+				array( 'label' => __( 'Vape Parts', 'flavor-starter' ), 'url' => $cat( 'vape-parts' ) ),
+			),
+		),
+		array(
+			'label'    => __( 'Information', 'flavor-starter' ),
+			'url'      => '#',
+			'children' => array(
+				array( 'label' => __( 'Tax Information', 'flavor-starter' ), 'url' => $pg( 'tax-information' ) ),
+				array( 'label' => __( 'About Us',        'flavor-starter' ), 'url' => $pg( 'about' ) ),
+				array( 'label' => __( 'Contact',         'flavor-starter' ), 'url' => $pg( 'contact' ) ),
+			),
+		),
+	);
+
 	echo '<ul class="fs-nav">';
-	echo '<li><a href="' . esc_url( home_url( '/' ) ) . '">' . esc_html__( 'Home', 'flavor-starter' ) . '</a></li>';
-	if ( class_exists( 'WooCommerce' ) ) {
-		echo '<li><a href="' . esc_url( wc_get_page_permalink( 'shop' ) ) . '">' . esc_html__( 'Shop', 'flavor-starter' ) . '</a></li>';
+	foreach ( $items as $item ) {
+		$has = ! empty( $item['children'] );
+		echo '<li' . ( $has ? ' class="menu-item-has-children"' : '' ) . '>';
+		echo '<a href="' . esc_url( $item['url'] ) . '"' . ( $has ? ' aria-haspopup="true" aria-expanded="false"' : '' ) . '>';
+		echo esc_html( $item['label'] );
+		if ( $has ) {
+			echo $chevron; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		}
+		echo '</a>';
+		if ( $has ) {
+			echo '<ul class="sub-menu">';
+			foreach ( $item['children'] as $child ) {
+				echo '<li><a href="' . esc_url( $child['url'] ) . '">' . esc_html( $child['label'] ) . '</a></li>';
+			}
+			echo '</ul>';
+		}
+		echo '</li>';
 	}
-	echo '<li><a href="' . esc_url( admin_url( 'nav-menus.php' ) ) . '">' . esc_html__( 'Set Menu', 'flavor-starter' ) . '</a></li>';
 	echo '</ul>';
 }
+
+/*--------------------------------------------------------------
+ * Inject chevron SVG into top-level items that have children
+ * when WordPress renders a real assigned menu.
+ *------------------------------------------------------------*/
+function flavor_starter_nav_item_chevron( $item_output, $item, $depth, $args ) {
+	if ( $depth > 0 ) {
+		return $item_output;
+	}
+	if ( ! in_array( $args->theme_location, array( 'primary', 'mobile' ), true ) ) {
+		return $item_output;
+	}
+	if ( ! in_array( 'menu-item-has-children', $item->classes, true ) ) {
+		return $item_output;
+	}
+	$chevron = '<svg class="fs-nav__chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>';
+	return str_replace( '</a>', $chevron . '</a>', $item_output );
+}
+add_filter( 'walker_nav_menu_start_el', 'flavor_starter_nav_item_chevron', 10, 4 );
+
+/*--------------------------------------------------------------
+ * Auto-create the primary navigation menu on theme activation.
+ * Runs once via after_switch_theme; skips if already created.
+ *------------------------------------------------------------*/
+function flavor_starter_create_default_menus() {
+	if ( get_option( 'fs_default_menu_created' ) ) {
+		return;
+	}
+
+	$wc   = class_exists( 'WooCommerce' );
+	$shop = $wc ? wc_get_page_permalink( 'shop' ) : home_url( '/' );
+
+	$cat = function( $slug ) use ( $wc, $shop ) {
+		if ( ! $wc ) {
+			return $shop;
+		}
+		$term = get_term_by( 'slug', $slug, 'product_cat' );
+		if ( $term && ! is_wp_error( $term ) ) {
+			$url = get_term_link( $term );
+			return is_wp_error( $url ) ? $shop : $url;
+		}
+		return add_query_arg( 'product_cat', $slug, $shop );
+	};
+
+	$pg = function( $path ) {
+		$page = get_page_by_path( $path );
+		return $page ? get_permalink( $page->ID ) : home_url( '/' . ltrim( $path, '/' ) . '/' );
+	};
+
+	$menu_name = _x( 'Primary Menu', 'nav menu name', 'flavor-starter' );
+	$menu_id   = wp_create_nav_menu( $menu_name );
+	if ( is_wp_error( $menu_id ) ) {
+		$existing = wp_get_nav_menu_object( $menu_name );
+		if ( ! $existing ) {
+			update_option( 'fs_default_menu_created', true );
+			return;
+		}
+		$menu_id = (int) $existing->term_id;
+	}
+
+	$structure = array(
+		array(
+			'title'    => __( 'Devices', 'flavor-starter' ),
+			'url'      => $cat( 'devices-kits' ),
+			'children' => array(
+				array( 'title' => __( 'Disposable Vapes',   'flavor-starter' ), 'url' => $cat( 'disposable-vapes' ) ),
+				array( 'title' => __( 'Closed Pod Devices', 'flavor-starter' ), 'url' => $cat( 'closed-pod-devices' ) ),
+				array( 'title' => __( 'Open Pod Devices',   'flavor-starter' ), 'url' => $cat( 'open-pod-devices' ) ),
+				array( 'title' => __( 'Devices & Kits',     'flavor-starter' ), 'url' => $cat( 'devices-kits' ) ),
+				array( 'title' => __( 'RDA & RDTA',         'flavor-starter' ), 'url' => $cat( 'rda-rdta' ) ),
+			),
+		),
+		array(
+			'title'    => __( 'E-Liquid', 'flavor-starter' ),
+			'url'      => $cat( 'e-liquid' ),
+			'children' => array(
+				array( 'title' => __( 'Salt Nic', 'flavor-starter' ), 'url' => $cat( 'salt-nic' ) ),
+				array( 'title' => __( 'Freebase', 'flavor-starter' ), 'url' => $cat( 'freebase' ) ),
+			),
+		),
+		array(
+			'title' => __( 'Coils & Pods', 'flavor-starter' ),
+			'url'   => $cat( 'coils-pods' ),
+		),
+		array(
+			'title'    => __( 'Accessories', 'flavor-starter' ),
+			'url'      => $cat( 'accessories' ),
+			'children' => array(
+				array( 'title' => __( 'Vape Parts', 'flavor-starter' ), 'url' => $cat( 'vape-parts' ) ),
+			),
+		),
+		array(
+			'title'    => __( 'Information', 'flavor-starter' ),
+			'url'      => '#',
+			'children' => array(
+				array( 'title' => __( 'Tax Information', 'flavor-starter' ), 'url' => $pg( 'tax-information' ) ),
+				array( 'title' => __( 'About Us',        'flavor-starter' ), 'url' => $pg( 'about' ) ),
+				array( 'title' => __( 'Contact',         'flavor-starter' ), 'url' => $pg( 'contact' ) ),
+			),
+		),
+	);
+
+	foreach ( $structure as $item ) {
+		$parent_id = wp_update_nav_menu_item( $menu_id, 0, array(
+			'menu-item-title'  => $item['title'],
+			'menu-item-url'    => $item['url'],
+			'menu-item-status' => 'publish',
+			'menu-item-type'   => 'custom',
+		) );
+		if ( ! is_wp_error( $parent_id ) && ! empty( $item['children'] ) ) {
+			foreach ( $item['children'] as $child ) {
+				wp_update_nav_menu_item( $menu_id, 0, array(
+					'menu-item-title'     => $child['title'],
+					'menu-item-url'       => $child['url'],
+					'menu-item-status'    => 'publish',
+					'menu-item-type'      => 'custom',
+					'menu-item-parent-id' => $parent_id,
+				) );
+			}
+		}
+	}
+
+	// Assign to primary and mobile locations only if not already set.
+	$locations = get_theme_mod( 'nav_menu_locations', array() );
+	foreach ( array( 'primary', 'mobile' ) as $location ) {
+		if ( empty( $locations[ $location ] ) ) {
+			$locations[ $location ] = $menu_id;
+		}
+	}
+	set_theme_mod( 'nav_menu_locations', $locations );
+	update_option( 'fs_default_menu_created', true );
+}
+add_action( 'after_switch_theme', 'flavor_starter_create_default_menus' );
 
 /*--------------------------------------------------------------
  * Comment callback

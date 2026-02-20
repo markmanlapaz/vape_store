@@ -11,14 +11,15 @@
 	/* ------------------------------------------------------------------
 	 * DOM References
 	 * ----------------------------------------------------------------*/
-	const header       = document.getElementById('masthead');
-	const mobileNav    = document.querySelector('.fs-mobile-nav');
-	const overlay      = document.querySelector('.fs-overlay');
-	const cartDrawer   = document.querySelector('.fs-cart-drawer');
+	const header        = document.getElementById('masthead');
+	const mobileNav     = document.querySelector('.fs-mobile-nav');
+	const overlay       = document.querySelector('.fs-overlay');
+	const cartDrawer    = document.querySelector('.fs-cart-drawer');
 	const searchOverlay = document.querySelector('.fs-search-overlay');
-	const backToTop    = document.querySelector('.fs-back-to-top');
-	const topBar       = document.querySelector('.fs-topbar');
-	const shopSidebar  = document.querySelector('.fs-shop__sidebar');
+	const backToTop     = document.querySelector('.fs-back-to-top');
+	const topBar        = document.querySelector('.fs-topbar');
+	const shopSidebar   = document.querySelector('.fs-shop__sidebar');
+	const sidebarOverlay = document.querySelector('.fs-sidebar-overlay');
 
 	/* ------------------------------------------------------------------
 	 * Sticky Header on Scroll
@@ -78,16 +79,16 @@
 				break;
 
 			case 'toggle-shop-sidebar':
-				if (shopSidebar) {
-					shopSidebar.classList.toggle('active');
-				}
+				toggleShopSidebar();
 				break;
 
 			case 'qty-decrease': {
 				const input = target.parentElement.querySelector('.fs-qty-input__field');
 				if (input) {
 					const val = parseInt(input.value, 10) || 1;
-					input.value = Math.max(1, val - 1);
+					const min = parseInt(input.min, 10) || 1;
+					input.value = Math.max(min, val - 1);
+					input.dispatchEvent(new Event('change', { bubbles: true }));
 				}
 				break;
 			}
@@ -96,8 +97,9 @@
 				const input = target.parentElement.querySelector('.fs-qty-input__field');
 				if (input) {
 					const val = parseInt(input.value, 10) || 1;
-					const max = parseInt(input.max, 10) || 99;
+					const max = parseInt(input.max, 10) || 9999;
 					input.value = Math.min(max, val + 1);
+					input.dispatchEvent(new Event('change', { bubbles: true }));
 				}
 				break;
 			}
@@ -285,5 +287,89 @@
 	const style = document.createElement('style');
 	style.textContent = '.fs-visible { opacity: 1 !important; transform: translateY(0) !important; }';
 	document.head.appendChild(style);
+
+	/* ------------------------------------------------------------------
+	 * Shop Sidebar (filters panel)
+	 * ----------------------------------------------------------------*/
+	function toggleShopSidebar() {
+		if (!shopSidebar) return;
+		const isOpen = shopSidebar.classList.contains('active');
+		if (isOpen) {
+			closeShopSidebar();
+		} else {
+			openShopSidebar();
+		}
+	}
+
+	function openShopSidebar() {
+		if (!shopSidebar) return;
+		shopSidebar.classList.add('active');
+		sidebarOverlay && sidebarOverlay.classList.add('active');
+		// Only lock scroll on mobile (sidebar is a panel, not inline).
+		if (window.innerWidth < 1024) {
+			document.body.style.overflow = 'hidden';
+		}
+		const toggleBtn = document.querySelector('.fs-shop__filter-toggle');
+		if (toggleBtn) toggleBtn.setAttribute('aria-expanded', 'true');
+	}
+
+	function closeShopSidebar() {
+		if (!shopSidebar) return;
+		shopSidebar.classList.remove('active');
+		sidebarOverlay && sidebarOverlay.classList.remove('active');
+		document.body.style.overflow = '';
+		const toggleBtn = document.querySelector('.fs-shop__filter-toggle');
+		if (toggleBtn) toggleBtn.setAttribute('aria-expanded', 'false');
+	}
+
+	// Close sidebar when clicking the backdrop overlay.
+	if (sidebarOverlay) {
+		sidebarOverlay.addEventListener('click', closeShopSidebar);
+	}
+
+	/* ------------------------------------------------------------------
+	 * Filter Group Accordion (collapse / expand individual sections)
+	 * ----------------------------------------------------------------*/
+	document.querySelectorAll('.fs-filter-group__toggle').forEach(function (btn) {
+		btn.addEventListener('click', function () {
+			const group   = btn.closest('.fs-filter-group');
+			const body    = btn.nextElementSibling;
+			const isOpen  = !group.classList.contains('collapsed');
+
+			group.classList.toggle('collapsed', isOpen);
+			btn.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
+		});
+	});
+
+	/* ------------------------------------------------------------------
+	 * Mobile Nav: Submenu Accordion
+	 * Injects a toggle button after each parent link and handles
+	 * open/close of the nested .sub-menu.
+	 * ----------------------------------------------------------------*/
+	(function initMobileSubmenus() {
+		const mobileMenu = document.querySelector('.fs-mobile-menu');
+		if (!mobileMenu) return;
+
+		mobileMenu.querySelectorAll('.menu-item-has-children').forEach(function (item) {
+			const link    = item.querySelector(':scope > a');
+			const subMenu = item.querySelector(':scope > .sub-menu');
+			if (!link || !subMenu) return;
+
+			const btn = document.createElement('button');
+			btn.type = 'button';
+			btn.className = 'fs-mobile-submenu-toggle';
+			btn.setAttribute('aria-expanded', 'false');
+			btn.setAttribute('aria-label', link.textContent.trim() + ' submenu');
+			btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>';
+
+			link.insertAdjacentElement('afterend', btn);
+
+			btn.addEventListener('click', function () {
+				const isOpen = subMenu.classList.toggle('open');
+				btn.classList.toggle('open', isOpen);
+				btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+			});
+		});
+	}());
 
 })();

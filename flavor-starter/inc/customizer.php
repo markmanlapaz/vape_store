@@ -241,17 +241,7 @@ function flavor_starter_customize_register( $wp_customize ) {
 		'input_attrs' => array( 'min' => 2, 'max' => 16, 'step' => 1 ),
 	) );
 
-	$wp_customize->add_setting( 'fs_home_show_blog', array(
-		'default'           => true,
-		'sanitize_callback' => 'flavor_starter_sanitize_checkbox',
-	) );
-	$wp_customize->add_control( 'fs_home_show_blog', array(
-		'label'   => __( 'Show Latest Blog Posts', 'flavor-starter' ),
-		'section' => 'fs_homepage',
-		'type'    => 'checkbox',
-	) );
-
-	/*------------------------------------------------------------------
+/*------------------------------------------------------------------
 	 * Section: Promo Banners
 	 *----------------------------------------------------------------*/
 	$wp_customize->add_section( 'fs_promos', array(

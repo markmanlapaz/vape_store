@@ -10,9 +10,19 @@ defined( 'ABSPATH' ) || exit;
 $hero_title    = get_theme_mod( 'fs_hero_title', __( 'Premium Vape &amp; E-Liquids', 'flavor-starter' ) );
 $hero_subtitle = get_theme_mod( 'fs_hero_subtitle', __( 'Experience the finest flavors crafted for enthusiasts', 'flavor-starter' ) );
 $hero_btn_text = get_theme_mod( 'fs_hero_btn_text', __( 'Shop Now', 'flavor-starter' ) );
-$hero_btn_url  = get_theme_mod( 'fs_hero_btn_url', '#' );
 $hero_btn2_text = get_theme_mod( 'fs_hero_btn2_text', __( 'New Arrivals', 'flavor-starter' ) );
-$hero_btn2_url  = get_theme_mod( 'fs_hero_btn2_url', '#' );
+
+// Resolve smart defaults for button URLs at render time.
+$_wc_active   = class_exists( 'WooCommerce' );
+$_shop_url    = $_wc_active ? wc_get_page_permalink( 'shop' ) : home_url( '/' );
+$hero_btn_url  = get_theme_mod( 'fs_hero_btn_url', '' );
+if ( empty( $hero_btn_url ) || '#' === $hero_btn_url ) {
+	$hero_btn_url = $_shop_url;
+}
+$hero_btn2_url = get_theme_mod( 'fs_hero_btn2_url', '' );
+if ( empty( $hero_btn2_url ) || '#' === $hero_btn2_url ) {
+	$hero_btn2_url = add_query_arg( 'orderby', 'date', $_shop_url );
+}
 $hero_bg       = get_theme_mod( 'fs_hero_bg_image', '' );
 $hero_style    = get_theme_mod( 'fs_hero_style', 'gradient' ); // gradient | image | video
 ?>

@@ -84,17 +84,7 @@ add_action( 'after_setup_theme', 'flavor_starter_content_width', 0 );
  * Widget Areas
  *------------------------------------------------------------*/
 function flavor_starter_widgets_init() {
-	register_sidebar( array(
-		'name'          => esc_html__( 'Blog Sidebar', 'flavor-starter' ),
-		'id'            => 'sidebar-blog',
-		'description'   => esc_html__( 'Appears on blog pages.', 'flavor-starter' ),
-		'before_widget' => '<section id="%1$s" class="fs-widget %2$s">',
-		'after_widget'  => '</section>',
-		'before_title'  => '<h3 class="fs-widget__title">',
-		'after_title'   => '</h3>',
-	) );
-
-	register_sidebar( array(
+register_sidebar( array(
 		'name'          => esc_html__( 'Shop Sidebar', 'flavor-starter' ),
 		'id'            => 'sidebar-shop',
 		'description'   => esc_html__( 'Appears on WooCommerce shop pages.', 'flavor-starter' ),

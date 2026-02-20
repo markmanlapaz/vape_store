@@ -122,21 +122,36 @@
 	}
 }
 
-/* Shop Sidebar */
+/* Shop Sidebar — desktop: static column; mobile: fixed slide-in panel */
 .fs-shop__sidebar {
-	display: none;
+	width: 260px;
+	flex-shrink: 0;
+	overflow-y: auto;
+	overflow-x: hidden;
 }
 
-.fs-shop__sidebar.active {
-	display: block;
-}
-
-@media (min-width: 1024px) {
+@media (max-width: 1023px) {
 	.fs-shop__sidebar {
-		display: block;
+		position: fixed;
+		top: 0;
+		left: 0;
+		bottom: 0;
+		width: min(300px, 88vw);
+		z-index: 1050;
+		overflow: auto;
+		transform: translateX(-100%);
+		transition: transform var(--fs-duration) var(--fs-ease);
+		background: var(--fs-bg-secondary);
+		border-right: 1px solid var(--fs-border);
+		-webkit-overflow-scrolling: touch;
+	}
+
+	.fs-shop__sidebar.active {
+		transform: translateX(0);
 	}
 }
 
+/* Sidebar inner padding (mobile only via padding on groups) */
 .fs-shop__sidebar .fs-widget {
 	background: var(--fs-bg-card);
 	border: 1px solid var(--fs-border);
@@ -151,6 +166,60 @@
 	margin-bottom: 1rem;
 	padding-bottom: 0.75rem;
 	border-bottom: 1px solid var(--fs-border);
+}
+
+/* Mobile sidebar header */
+.fs-sidebar-header {
+	display: none;
+}
+
+@media (max-width: 1023px) {
+	.fs-sidebar-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 1.25rem var(--fs-gutter);
+		border-bottom: 1px solid var(--fs-border);
+		position: sticky;
+		top: 0;
+		background: var(--fs-bg-secondary);
+		z-index: 1;
+	}
+}
+
+.fs-sidebar-header__title {
+	font-family: var(--fs-font-heading);
+	font-weight: 700;
+	font-size: 1rem;
+}
+
+.fs-sidebar-close {
+	background: none;
+	border: none;
+	color: var(--fs-text-secondary);
+	cursor: pointer;
+	padding: 0.25rem;
+	display: flex;
+	align-items: center;
+	transition: color 0.2s ease;
+}
+
+.fs-sidebar-close:hover {
+	color: var(--fs-accent-primary);
+}
+
+/* Backdrop overlay (mobile) */
+.fs-sidebar-overlay {
+	display: none;
+	position: fixed;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.65);
+	z-index: 1045;
+	cursor: pointer;
+}
+
+.fs-sidebar-overlay.active {
+	display: block;
 }
 
 /* Products grid in WC loop */
@@ -604,8 +673,9 @@
    ========================================================================== */
 .related.products,
 .upsells.products {
+	width: 100%;
 	margin-top: 3rem;
-	padding: 2rem var(--fs-gutter) 0;
+	padding: 2rem 0 0;
 	border-top: 1px solid var(--fs-border);
 }
 
@@ -623,6 +693,16 @@
 	gap: 1.25rem;
 	list-style: none;
 	padding: 0;
+	margin: 0;
+	float: none;
+	clear: both;
+}
+
+.related.products ul.products li.product,
+.upsells.products ul.products li.product {
+	float: none;
+	width: auto;
+	margin: 0;
 }
 
 @media (min-width: 768px) {
@@ -908,7 +988,67 @@
 		display: grid;
 		grid-template-columns: 240px 1fr;
 		gap: 2rem;
+		align-items: start;
 	}
+
+	.woocommerce-account .woocommerce-MyAccount-navigation {
+		margin-bottom: 0;
+		position: sticky;
+		top: 100px;
+	}
+
+	.woocommerce-account .woocommerce-MyAccount-content {
+		min-width: 0;
+	}
+}
+
+.woocommerce-account .woocommerce-MyAccount-content table {
+	width: 100%;
+}
+
+.woocommerce-account .woocommerce-orders-table,
+.woocommerce-account .woocommerce-table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.woocommerce-account .woocommerce-orders-table th,
+.woocommerce-account .woocommerce-table th {
+	text-align: left;
+	padding: 0.75rem 1rem;
+	font-size: 0.85rem;
+	font-weight: 600;
+	color: var(--fs-text-muted);
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+	border-bottom: 1px solid var(--fs-border);
+}
+
+.woocommerce-account .woocommerce-orders-table td,
+.woocommerce-account .woocommerce-table td {
+	padding: 0.75rem 1rem;
+	border-bottom: 1px solid var(--fs-border);
+	font-size: 0.9rem;
+	color: var(--fs-text-secondary);
+}
+
+.woocommerce-account .woocommerce-orders-table__cell-order-actions a,
+.woocommerce-account .button {
+	display: inline-block;
+	padding: 0.35rem 0.85rem;
+	background: var(--fs-accent-primary);
+	color: #fff;
+	border-radius: var(--fs-radius-sm);
+	font-size: 0.8rem;
+	font-weight: 600;
+	text-decoration: none;
+	transition: background 0.2s ease;
+}
+
+.woocommerce-account .woocommerce-orders-table__cell-order-actions a:hover,
+.woocommerce-account .button:hover {
+	background: #7c3aed;
+	color: #fff;
 }
 
 /* ==========================================================================
@@ -1027,4 +1167,387 @@
 	position: absolute;
 	left: 0;
 	letter-spacing: 0.1em;
+}
+
+/* ==========================================================================
+   ACTIVE FILTERS STRIP
+   ========================================================================== */
+.fs-active-filters {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.75rem 0;
+	margin-bottom: 1rem;
+}
+
+.fs-active-filters__label {
+	font-size: 0.8rem;
+	font-weight: 600;
+	color: var(--fs-text-muted);
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+}
+
+.fs-active-filter-chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	padding: 0.3rem 0.65rem;
+	background: rgba(139, 92, 246, 0.1);
+	border: 1px solid rgba(139, 92, 246, 0.3);
+	border-radius: var(--fs-radius-pill);
+	font-size: 0.8rem;
+	font-weight: 500;
+	color: var(--fs-accent-primary);
+	text-decoration: none;
+	transition: all 0.2s ease;
+}
+
+.fs-active-filter-chip:hover {
+	background: rgba(139, 92, 246, 0.2);
+	color: var(--fs-accent-primary);
+}
+
+.fs-active-filters__clear {
+	margin-left: auto;
+	font-size: 0.8rem;
+	color: var(--fs-text-muted);
+	text-decoration: underline;
+	text-underline-offset: 2px;
+	transition: color 0.2s ease;
+}
+
+.fs-active-filters__clear:hover {
+	color: var(--fs-accent-tertiary);
+}
+
+/* Filter count badge on the toggle button */
+.fs-shop__filter-count {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 18px;
+	height: 18px;
+	padding: 0 4px;
+	background: var(--fs-accent-primary);
+	color: #fff;
+	border-radius: 100px;
+	font-size: 0.7rem;
+	font-weight: 700;
+}
+
+/* Sort label */
+.fs-shop__sort-label {
+	font-size: 0.85rem;
+	color: var(--fs-text-muted);
+	white-space: nowrap;
+}
+
+/* ==========================================================================
+   SIDEBAR FILTER GROUPS
+   ========================================================================== */
+.fs-filter-group {
+	border-bottom: 1px solid var(--fs-border);
+}
+
+@media (max-width: 1023px) {
+	.fs-filter-group {
+		padding: 0 var(--fs-gutter);
+	}
+}
+
+.fs-filter-group:last-child {
+	border-bottom: none;
+}
+
+.fs-filter-group__toggle {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	width: 100%;
+	background: none;
+	border: none;
+	color: var(--fs-text-primary);
+	font-family: var(--fs-font-heading);
+	font-size: 0.9rem;
+	font-weight: 700;
+	padding: 1.1rem 0;
+	cursor: pointer;
+	text-align: left;
+	gap: 0.5rem;
+	letter-spacing: 0.01em;
+}
+
+.fs-filter-group__toggle:hover {
+	color: var(--fs-accent-primary);
+}
+
+.fs-filter-group__chevron {
+	flex-shrink: 0;
+	color: var(--fs-text-muted);
+	transition: transform var(--fs-duration) var(--fs-ease);
+}
+
+.fs-filter-group.collapsed .fs-filter-group__chevron {
+	transform: rotate(-90deg);
+}
+
+.fs-filter-group__body {
+	padding-bottom: 1.1rem;
+}
+
+.fs-filter-group.collapsed .fs-filter-group__body {
+	display: none;
+}
+
+/* ── Category tree ─────────────────────────────────────────── */
+.fs-filter-cats {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 1px;
+}
+
+.fs-filter-cats--sub {
+	padding-left: 0.75rem;
+	margin-top: 2px;
+	border-left: 1px solid var(--fs-border);
+	display: none; /* expanded via .fs-filter-cat--open */
+}
+
+.fs-filter-cat--open > .fs-filter-cats--sub {
+	display: flex;
+}
+
+.fs-filter-cat__link {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0.35rem 0.5rem;
+	font-size: 0.875rem;
+	color: var(--fs-text-secondary);
+	border-radius: var(--fs-radius-sm);
+	text-decoration: none;
+	transition: all 0.15s ease;
+}
+
+.fs-filter-cat__link:hover {
+	color: var(--fs-text-primary);
+	background: rgba(255, 255, 255, 0.04);
+}
+
+.fs-filter-cat__link--active {
+	color: var(--fs-accent-primary);
+	font-weight: 600;
+	background: rgba(139, 92, 246, 0.08);
+}
+
+.fs-filter-cat__count {
+	font-size: 0.72rem;
+	color: var(--fs-text-muted);
+	background: rgba(255, 255, 255, 0.05);
+	padding: 0 0.4rem;
+	border-radius: 100px;
+	min-width: 22px;
+	text-align: center;
+	flex-shrink: 0;
+}
+
+.fs-filter-cats__all {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.3rem;
+	margin-top: 0.6rem;
+	padding: 0.3rem 0.5rem;
+	font-size: 0.82rem;
+	color: var(--fs-text-muted);
+	text-decoration: none;
+	border-radius: var(--fs-radius-sm);
+	transition: color 0.15s ease;
+}
+
+.fs-filter-cats__all:hover {
+	color: var(--fs-accent-primary);
+}
+
+/* ── Checkbox filters (brand / series) ────────────────────── */
+.fs-filter-checks {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 1px;
+	max-height: 230px;
+	overflow-y: auto;
+}
+
+.fs-filter-checks::-webkit-scrollbar { width: 3px; }
+.fs-filter-checks::-webkit-scrollbar-track { background: transparent; }
+.fs-filter-checks::-webkit-scrollbar-thumb { background: var(--fs-border); border-radius: 4px; }
+
+.fs-filter-check__item {
+	display: flex;
+	align-items: center;
+	gap: 0.55rem;
+	padding: 0.35rem 0.5rem;
+	border-radius: var(--fs-radius-sm);
+	font-size: 0.875rem;
+	color: var(--fs-text-secondary);
+	text-decoration: none;
+	transition: all 0.15s ease;
+	cursor: pointer;
+}
+
+.fs-filter-check__item:hover {
+	color: var(--fs-text-primary);
+	background: rgba(255, 255, 255, 0.04);
+}
+
+.fs-filter-check__item--active {
+	color: var(--fs-accent-primary);
+}
+
+.fs-filter-check__box {
+	width: 15px;
+	height: 15px;
+	border: 1.5px solid var(--fs-border);
+	border-radius: 3px;
+	flex-shrink: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: all 0.15s ease;
+	color: #fff;
+}
+
+.fs-filter-check__item--active .fs-filter-check__box {
+	background: var(--fs-accent-primary);
+	border-color: var(--fs-accent-primary);
+}
+
+.fs-filter-check__label {
+	flex: 1;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.fs-filter-check__count {
+	font-size: 0.72rem;
+	color: var(--fs-text-muted);
+	background: rgba(255, 255, 255, 0.05);
+	padding: 0 0.4rem;
+	border-radius: 100px;
+	min-width: 22px;
+	text-align: center;
+	flex-shrink: 0;
+}
+
+/* ==========================================================================
+   QUANTITY INPUT (+/- buttons)
+   ========================================================================== */
+.fs-qty-input {
+	display: inline-flex;
+	align-items: stretch;
+	height: 46px;
+	border: 1px solid var(--fs-border);
+	border-radius: var(--fs-radius-sm);
+	overflow: hidden;
+}
+
+.fs-qty-input__btn {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 42px;
+	flex-shrink: 0;
+	background: var(--fs-bg-elevated);
+	border: none;
+	color: var(--fs-text-secondary);
+	cursor: pointer;
+	transition: all 0.15s ease;
+}
+
+.fs-qty-input__btn:hover {
+	background: var(--fs-bg-card-hover);
+	color: var(--fs-accent-primary);
+}
+
+.fs-qty-input__field {
+	width: 56px;
+	text-align: center;
+	background: var(--fs-bg-card);
+	border: none;
+	border-left: 1px solid var(--fs-border);
+	border-right: 1px solid var(--fs-border);
+	color: var(--fs-text-primary);
+	font-weight: 600;
+	font-size: 1rem;
+	-moz-appearance: textfield;
+	height: 100%;
+}
+
+.fs-qty-input__field::-webkit-inner-spin-button,
+.fs-qty-input__field::-webkit-outer-spin-button {
+	-webkit-appearance: none;
+}
+
+/* Override existing .summary .quantity border now that we use .fs-qty-input */
+.summary .quantity {
+	border: none;
+	border-radius: 0;
+	overflow: visible;
+	display: inline-block;
+}
+
+/* Wishlist button in single product cart form */
+.fs-single-wishlist-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	height: 46px;
+	padding: 0 1.25rem;
+	white-space: nowrap;
+}
+
+/* ==========================================================================
+   SINGLE PRODUCT — tabs + related container
+   ========================================================================== */
+.fs-product-extra {
+	padding-bottom: 4rem;
+}
+
+.woocommerce-tabs {
+	border-top: 1px solid var(--fs-border);
+	padding-top: 2.5rem;
+	margin-top: 0;
+	padding-left: 0;
+	padding-right: 0;
+}
+
+/* Related / upsell padding already set in main rule above */
+
+/* ==========================================================================
+   SINGLE PRODUCT — gallery enhancements
+   ========================================================================== */
+.woocommerce-product-gallery__wrapper {
+	border-radius: var(--fs-radius);
+	overflow: hidden;
+}
+
+.woocommerce-product-gallery--with-images .woocommerce-product-gallery__trigger {
+	background: var(--fs-bg-elevated);
+	border-radius: var(--fs-radius-sm);
+	padding: 0.4rem;
+	opacity: 0.8;
+	transition: opacity 0.2s ease;
+}
+
+.woocommerce-product-gallery--with-images .woocommerce-product-gallery__trigger:hover {
+	opacity: 1;
 }

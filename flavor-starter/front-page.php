@@ -29,12 +29,7 @@ get_header();
 	// Brands / Trust Bar.
 	get_template_part( 'template-parts/trust-bar' );
 
-	// Latest Blog Posts (optional).
-	$show_blog = get_theme_mod( 'fs_home_show_blog', true );
-	if ( $show_blog ) {
-		get_template_part( 'template-parts/latest-posts' );
-	}
-	?>
+?>
 
 </main>
 
